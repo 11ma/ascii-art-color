@@ -1,0 +1,21 @@
+package color
+
+var Reset = "\x1b[0m"
+var Black = "\x1b[30m"
+var Red = "\x1b[31m"
+var Green = "\x1b[32m"
+var Yellow = "\x1b[33m"
+var Blue = "\x1b[34m"
+var Purple = "\x1b[35m"
+var Cyan = "\x1b[36m"
+var White = "\x1b[37m"
+var BrightBlack = "\x1b[90m"
+var BrightRed = "\x1b[91m"
+var BrightGreen = "\x1b[92m"
+var BrightBlue = "\x1b[93m"
+var BrightYellow = "\x1b[94m"
+var BrightMagenta = "\x1b[95m"
+var BrightCyan = "\x1b[96m"
+var BrightWhite = "\x1b[97m"
+
+// var Orange = "\x1b[38;2;17;36;212m"
