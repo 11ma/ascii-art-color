@@ -42,27 +42,28 @@ func checkHueValue(H, C, X, m float64) (R, G, B string) {
 	var B1 float64
 
 	// checking the range of the hue value for lightness
-	if H < 60 {
+	switch {
+	case H < 60:
 		R1 = C
 		G1 = X
 		B1 = 0
-	} else if H < 120 {
+	case H < 120:
 		R1 = X
 		G1 = C
 		B1 = 0
-	} else if H < 180 {
+	case H < 180:
 		R1 = 0
 		G1 = C
 		B1 = X
-	} else if H < 240 {
+	case H < 240:
 		R1 = 0
 		G1 = X
 		B1 = C
-	} else if H < 300 {
+	case H < 300:
 		R1 = X
 		G1 = 0
 		B1 = C
-	} else if H < 360 {
+	case H < 360:
 		R1 = C
 		G1 = 0
 		B1 = X
