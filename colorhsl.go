@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func ColorHSL(s string) string {
+func convertStringToFloat(s string) (H, S, L float64) {
 	s = strings.TrimPrefix(s, "hsl(")
 	s = strings.TrimSuffix(s, ")")
 	removeSpaceAndJoin := strings.Join(strings.Fields(s), "")
@@ -16,57 +16,68 @@ func ColorHSL(s string) string {
 	sTrimmed, _ := strconv.Atoi(strings.Trim(hsl[1], "%,"))
 	lTrimmed, _ := strconv.Atoi(strings.Trim(hsl[2], "%,"))
 
-	H := float64(hTrimmed)
-	S := float64(sTrimmed)
-	L := float64(lTrimmed)
+	H = float64(hTrimmed)
+	S = float64(sTrimmed) / 100
+	L = float64(lTrimmed) / 100
+	return H, S, L
+}
 
-	S = S / 100
-	L = L / 100
-
+func converToRGB(H, S, L float64) (C, X, m float64) {
 	modC := math.Abs((2 * L) - 1)
 	modX := math.Abs(math.Mod((H/60), 2) - 1)
 
-	C := (1 - modC) * S
-	X := C * (1 - modX)
-	m := L - C/2
+	// we compute chroma, by multiplying saturation by the maximum chroma for a given lightness or value
+	C = (1 - modC) * S
+	// we find the point on one of the bottom three faces of the RGB cube which has the same hue and chroma as our color
+	X = C * (1 - modX)
 
-	var RDerivative float64
-	var GDerivative float64
-	var BDerivative float64
+	m = L - C/2
 
+	return C, X, m
+}
+
+func checkHueValue(H, C, X, m float64) (R, G, B string) {
+	var R1 float64
+	var G1 float64
+	var B1 float64
+
+	// checking the range of the hue value for lightness
 	if H < 60 {
-		RDerivative = C
-		GDerivative = X
-		BDerivative = 0
+		R1 = C
+		G1 = X
+		B1 = 0
 	} else if H < 120 {
-		RDerivative = X
-		GDerivative = C
-		BDerivative = 0
+		R1 = X
+		G1 = C
+		B1 = 0
 	} else if H < 180 {
-		RDerivative = 0
-		GDerivative = C
-		BDerivative = X
+		R1 = 0
+		G1 = C
+		B1 = X
 	} else if H < 240 {
-		RDerivative = 0
-		GDerivative = X
-		BDerivative = C
+		R1 = 0
+		G1 = X
+		B1 = C
 	} else if H < 300 {
-		RDerivative = X
-		GDerivative = 0
-		BDerivative = C
+		R1 = X
+		G1 = 0
+		B1 = C
 	} else if H < 360 {
-		RDerivative = C
-		GDerivative = 0
-		BDerivative = X
+		R1 = C
+		G1 = 0
+		B1 = X
 	}
+	// we add equal amounts of R, G, and B to reach the proper lightness
+	R = strconv.Itoa(int((R1 + m) * 255))
+	G = strconv.Itoa(int((G1 + m) * 255))
+	B = strconv.Itoa(int((B1 + m) * 255))
 
-	R := int((RDerivative + m) * 255)
-	G := int((GDerivative + m) * 255)
-	B := int((BDerivative + m) * 255)
+	return R, G, B
+}
 
-	strR := strconv.Itoa(R)
-	strG := strconv.Itoa(G)
-	strB := strconv.Itoa(B)
-
-	return RGBToANSI(strR, strG, strB)
+func ColorHSL(s string) string {
+	H, S, L := convertStringToFloat(s)
+	C, X, m := converToRGB(H, S, L)
+	R, G, B := checkHueValue(H, C, X, m)
+	return RGBToANSI(R, G, B)
 }
