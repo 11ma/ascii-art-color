@@ -1,7 +1,6 @@
 package color
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -10,7 +9,8 @@ import (
 func ColorHSL(s string) string {
 	s = strings.TrimPrefix(s, "hsl(")
 	s = strings.TrimSuffix(s, ")")
-	hsl := strings.Fields(s)
+	removeSpaceAndJoin := strings.Join(strings.Fields(s), "")
+	hsl := strings.Split(removeSpaceAndJoin, ",")
 
 	hTrimmed, _ := strconv.Atoi(strings.Trim(hsl[0], "%,"))
 	sTrimmed, _ := strconv.Atoi(strings.Trim(hsl[1], "%,"))
@@ -63,8 +63,6 @@ func ColorHSL(s string) string {
 	R := int((RDerivative + m) * 255)
 	G := int((GDerivative + m) * 255)
 	B := int((BDerivative + m) * 255)
-
-	fmt.Println(R, G, B)
 
 	strR := strconv.Itoa(R)
 	strG := strconv.Itoa(G)
