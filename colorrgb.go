@@ -1,15 +1,17 @@
 package color
 
 import (
-	"os"
+	"strconv"
 	"strings"
 )
 
+// change rgb string value to ansi color
 func RGBToANSI(r, g, b string) string {
-	var color = "\x1b[38;2;" + r + ";" + g + ";" + b + "m"
+	color := "\x1b[38;2;" + r + ";" + g + ";" + b + "m"
 	return color
 }
 
+// get the rgb value in ansi code
 func ColorRGB(s string) string {
 	s = strings.ToLower(s)
 	s = strings.TrimPrefix(s, "rgb(")
@@ -18,7 +20,17 @@ func ColorRGB(s string) string {
 	splits := strings.Split(removeSpaceAndJoin, ",")
 
 	if len(splits) != 3 {
-		os.Exit(0)
+		WrongColorType()
+	}
+
+	for i := 0; i < len(splits); i++ {
+		hexValue, err := strconv.Atoi(splits[i])
+		if err != nil {
+			WrongColorType()
+		}
+		if hexValue > 255 || hexValue < 0 {
+			WrongColorType()
+		}
 	}
 
 	r := strings.Trim(splits[0], ",")

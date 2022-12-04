@@ -6,15 +6,20 @@ import (
 	"strings"
 )
 
-func convertStringToFloat(s string) (H, S, L float64) {
+func convertStringToHSL(s string) (H, S, L float64) {
+	s = strings.ToLower(s)
 	s = strings.TrimPrefix(s, "hsl(")
 	s = strings.TrimSuffix(s, ")")
 	removeSpaceAndJoin := strings.Join(strings.Fields(s), "")
 	hsl := strings.Split(removeSpaceAndJoin, ",")
 
-	hTrimmed, _ := strconv.Atoi(strings.Trim(hsl[0], "%,"))
-	sTrimmed, _ := strconv.Atoi(strings.Trim(hsl[1], "%,"))
-	lTrimmed, _ := strconv.Atoi(strings.Trim(hsl[2], "%,"))
+	hTrimmed, err1 := strconv.Atoi(strings.Trim(hsl[0], "%,"))
+	sTrimmed, err2 := strconv.Atoi(strings.Trim(hsl[1], "%,"))
+	lTrimmed, err3 := strconv.Atoi(strings.Trim(hsl[2], "%,"))
+
+	if err1 != nil || err2 != nil || err3 != nil || hTrimmed < 0 || hTrimmed > 360 || sTrimmed < 0 || sTrimmed > 100 || lTrimmed < 0 || lTrimmed > 100 {
+		WrongColorType()
+	}
 
 	H = float64(hTrimmed)
 	S = float64(sTrimmed) / 100
@@ -76,8 +81,9 @@ func checkHueValue(H, C, X, m float64) (R, G, B string) {
 	return R, G, B
 }
 
+// get the hsl value in ansi code
 func ColorHSL(s string) string {
-	H, S, L := convertStringToFloat(s)
+	H, S, L := convertStringToHSL(s)
 	C, X, m := converToRGB(H, S, L)
 	R, G, B := checkHueValue(H, C, X, m)
 	return RGBToANSI(R, G, B)
